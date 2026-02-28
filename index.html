@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crypto Terminal-PRO</title>
+
+<style>
+:root{
+  --bg:#000;
+  --text:#fff;
+  --panel:rgba(255,255,255,0.08);
+}
+body.white{
+  --bg:#fff;
+  --text:#000;
+  --panel:#f3f3f3;
+}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial, sans-serif;
+  margin:0;
+  padding:0 15px;
+  transition:.25s ease;
+}
+
+/* HEADER */
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px 0;
+}
+.pro-gold{
+  background:linear-gradient(135deg,#f5d77a,#ffd700,#b8860b);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  font-weight:900;
+}
+
+/* AI PANEL */
+.ai-glass{
+  background:var(--panel);
+  backdrop-filter:blur(14px);
+  border-radius:20px;
+  padding:30px;
+  margin-top:25px;
+  position:relative;
+}
+
+.ai-title{
+  font-size:30px;
+  font-weight:800;
+  margin-bottom:10px;
+}
+.ai-gold{
+  background:linear-gradient(135deg,#f5d77a,#ffd700,#b8860b);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  font-weight:900;
+}
+
+.ai-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  margin-bottom:20px;
+}
+
+.ai-controls{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.ai-metric{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 0;
+  font-size:17px;
+}
+
+.metric-left{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.ai-metric-value{
+  min-width:95px;
+  text-align:right;
+  font-weight:600;
+}
+
+.info-icon{
+  background:#2b7cff;
+  color:#fff;
+  border-radius:50%;
+  width:18px;
+  height:18px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12px;
+  cursor:pointer;
+}
+
+/* 🔥 LOADING SHIMMER */
+.ai-loading{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(
+    90deg,
+    rgba(255,255,255,0.05) 25%,
+    rgba(255,255,255,0.15) 50%,
+    rgba(255,255,255,0.05) 75%
+  );
+  background-size:400% 100%;
+  animation:shimmer 1.5s infinite;
+  border-radius:20px;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  font-weight:600;
+  font-size:18px;
+  backdrop-filter:blur(6px);
+}
+@keyframes shimmer{
+  0%{background-position:200% 0;}
+  100%{background-position:-200% 0;}
+}
+
+/* MODAL */
+#infoModal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.65);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+}
+#infoContent{
+  background:white;
+  color:#000;
+  max-width:520px;
+  width:92%;
+  padding:28px;
+  border-radius:18px;
+  line-height:1.6;
+  box-shadow:0 20px 50px rgba(0,0,0,0.35);
+}
+#infoContent h3{
+  margin-top:0;
+}
+
+/* Fear & Greed */
+#fearGreed{
+  text-align:center;
+  margin-top:20px;
+  font-size:14px;
+}
+
+.disclaimer{
+  text-align:center;
+  font-size:12px;
+  margin-top:18px;
+  opacity:0.85;
+}
+
+@media(max-width:768px){
+  .ai-header{
+    flex-direction:column;
+    gap:15px;
+  }
+  .ai-title{
+    font-size:24px;
+  }
+}
+</style>
+
+<script src="https://s3.tradingview.com/tv.js"></script>
+<script src="ai-engine.js"></script>
+<script src="app.js" defer></script>
+</head>
+
+<body>
+
+<header>
+  <h2>Crypto Terminal-<span class="pro-gold">PRO</span></h2>
+  <button id="themeToggle">Toggle Theme</button>
+</header>
+
+<div id="tv_chart" style="height:500px;margin-top:20px;"></div>
+
+<div class="ai-glass">
+
+  <div class="ai-loading" id="aiLoading">
+    Updating AI...
+  </div>
+
+  <div class="ai-header">
+
+    <div>
+      <div class="ai-title">
+        <span class="ai-gold">AI</span> Outlook
+        <span class="info-icon" data-info="overview">i</span>
+      </div>
+
+      <select id="coinSelect">
+        <option value="ethereum">ETH</option>
+        <option value="bitcoin">BTC</option>
+        <option value="solana">SOL</option>
+        <option value="litecoin">LTC</option>
+        <option value="dogecoin">DOGE</option>
+        <option value="ripple">XRP</option>
+        <option value="cardano">ADA</option>
+      </select>
+    </div>
+
+    <div class="ai-controls">
+      <div>
+        <select id="aiTimeframeSelect">
+          <option value="1m">1 MIN</option>
+          <option value="5m">5 MIN</option>
+          <option value="30m">30 MIN</option>
+          <option value="1h">1 HR</option>
+          <option value="4h">4 HR</option>
+          <option value="1d">1 DAY</option>
+          <option value="1w">1 WEEK</option>
+          <option value="1mo">1 MONTH</option>
+          <option value="3mo">3 MONTHS</option>
+        </select>
+        <span class="info-icon" data-info="timeframe">i</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="ai-panel"></div>
+  <div id="fearGreed"></div>
+
+  <div style="text-align:center;margin-top:12px;">
+    <button id="refreshAI">Refresh AI</button>
+  </div>
+
+  <div class="disclaimer">
+    This interface provides algorithmic analysis using technical indicators.
+    It is for educational purposes only and not financial advice.
+  </div>
+
+</div>
+
+<div id="infoModal">
+  <div id="infoContent">
+    <h3 id="modalTitle"></h3>
+    <div id="modalText" style="white-space:pre-line;"></div>
+    <div style="text-align:center;margin-top:18px;">
+      <button id="closeModal">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  const infoContent = {
+
+    overview:{
+title:"AI Outlook",
+text:`DESCRIPTION:
+Combines RSI and directional pressure scoring to estimate market bias.
+
+BEGINNER GUIDANCE:
+Green zone = Buyers stronger.
+Red zone = Sellers stronger.
+Middle = Consolidation.
+
+EXPERT GUIDANCE:
+Focus on probability + trend strength alignment.
+Strong signals across higher timeframes carry more weight.`
+    },
+
+    timeframe:{
+title:"Timeframe Guide",
+text:`DESCRIPTION:
+Determines how much historical data influences calculations.
+
+BEGINNER GUIDANCE:
+1m–30m = Short-term trades.
+1h–4h = Swing trades.
+1d+ = Position trades.
+
+EXPERT GUIDANCE:
+Higher timeframes filter noise.
+Always align lower timeframe entries with higher timeframe bias.`
+    },
+
+    rsi:{
+title:"RSI (Relative Strength Index)",
+text:`DESCRIPTION:
+Momentum oscillator measuring speed of price change (0–100).
+
+BEGINNER GUIDANCE:
+Below 30 = Oversold.
+Above 70 = Overbought.
+40–60 = Neutral.
+
+EXPERT GUIDANCE:
+Watch for RSI divergence vs price.
+Sustained RSI above 60 = Bull trend strength.
+Sustained below 40 = Bear trend strength.`
+    },
+
+    bull:{
+title:"Bullish Pressure",
+text:`DESCRIPTION:
+Percentage score representing buyer dominance.
+
+BEGINNER GUIDANCE:
+Higher % = Buyers stronger.
+
+EXPERT GUIDANCE:
+Extreme readings may indicate breakout strength or exhaustion.
+Combine with volume and volatility context.`
+    },
+
+    bear:{
+title:"Bearish Pressure",
+text:`DESCRIPTION:
+Percentage score representing seller dominance.
+
+BEGINNER GUIDANCE:
+Higher % = Sellers stronger.
+
+EXPERT GUIDANCE:
+Capitulation often occurs near extreme values.
+Look for reversal signals when paired with oversold RSI.`
+    },
+
+    probability:{
+title:"Probability",
+text:`DESCRIPTION:
+Measures directional imbalance between bull and bear forces.
+
+BEGINNER GUIDANCE:
+Higher % = Stronger conviction.
+Not a guarantee of outcome.
+
+EXPERT GUIDANCE:
+Probability > 60% on higher timeframes indicates structural bias.
+Use for bias alignment, not standalone entry signals.`
+    },
+
+    strength:{
+title:"Trend Strength",
+text:`DESCRIPTION:
+Quantifies sustainability of the current directional bias (0–100).
+
+BEGINNER GUIDANCE:
+0–30 Weak.
+30–70 Moderate.
+70–100 Strong.
+
+EXPERT GUIDANCE:
+Strong trend strength with rising volatility confirms expansion phase.
+Weak strength signals potential range or consolidation.`
+    }
+
+  };
+
+  document.body.addEventListener("click", e=>{
+    if(e.target.classList.contains("info-icon")){
+      const key = e.target.dataset.info;
+      const data = infoContent[key];
+      if(!data) return;
+      document.getElementById("modalTitle").innerText = data.title;
+      document.getElementById("modalText").innerText = data.text;
+      document.getElementById("infoModal").style.display="flex";
+    }
+  });
+
+  document.getElementById("closeModal").onclick = ()=>{
+    document.getElementById("infoModal").style.display="none";
+  };
+
+  document.getElementById("themeToggle").onclick = ()=>{
+    document.body.classList.toggle("white");
+  };
+
+  document.getElementById("refreshAI").onclick = ()=>{
+    const loader = document.getElementById("aiLoading");
+    loader.style.display = "flex";
+    if(typeof loadHistorical==="function") loadHistorical();
+    setTimeout(()=>loader.style.display="none",1200);
+  };
+
+});
+</script>
+
+</body>
+</html>

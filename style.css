@@ -1,0 +1,59 @@
+body {
+  margin:0;
+  background:#0a0f14;
+  color:#e0e6ed;
+  font-family:Inter, Arial, sans-serif;
+}
+
+.topbar {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px 25px;
+  background:#11161d;
+  border-bottom:1px solid #1f2a36;
+}
+
+.logo {
+  font-weight:600;
+  color:#00ff88;
+}
+
+.container {
+  padding:20px;
+}
+
+#tv_chart {
+  height:70vh;
+  border-radius:8px;
+}
+
+#ai-panel, #feargreed, #portfolio-section {
+  margin-top:20px;
+  padding:20px;
+  background:#11161d;
+  border-radius:10px;
+  border:1px solid #1f2a36;
+}
+
+.ai-signal {
+  font-size:28px;
+  font-weight:700;
+}
+
+.risk-bar {
+  margin-top:10px;
+  height:8px;
+  background:#1f2a36;
+  border-radius:4px;
+}
+
+.risk-fill {
+  height:100%;
+  border-radius:4px;
+}
+
+button {
+  margin-top:8px;
+  padding:6px 10px;
+}
