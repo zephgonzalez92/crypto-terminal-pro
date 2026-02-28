@@ -10,6 +10,16 @@ let currentFetchController = null;
 let requestVersion = 0;
 let priceFetchInProgress = false;
 
+/* ===== RESTORE THEME (DEFAULT = WHITE) ===== */
+
+const savedTheme = localStorage.getItem("selectedTheme") || "white";
+
+if (savedTheme === "black") {
+  document.body.classList.add("black-theme");
+} else {
+  document.body.classList.remove("black-theme");
+}
+
 /* ===== MAPS ===== */
 
 const coinMap = {
@@ -51,6 +61,10 @@ function saveSelections() {
   localStorage.setItem("selectedTimeframe", aiTimeframe);
 }
 
+function saveTheme(theme) {
+  localStorage.setItem("selectedTheme", theme);
+}
+
 /* ===== GLOBAL ERROR GUARD ===== */
 
 window.addEventListener("unhandledrejection", function (event) {
@@ -71,12 +85,15 @@ function createChart() {
     const symbol = binanceMap[currentCoin];
     document.getElementById("tv_chart").innerHTML = "";
 
+    const currentTheme =
+      document.body.classList.contains("black-theme") ? "dark" : "light";
+
     new TradingView.widget({
       autosize: true,
       symbol: "BINANCE:" + symbol,
       interval: "60",
       timezone: "Etc/UTC",
-      theme: "dark", // permanently dark since toggle removed
+      theme: currentTheme,
       style: "1",
       container_id: "tv_chart"
     });
@@ -106,10 +123,7 @@ async function loadHistorical() {
       { signal: currentFetchController.signal }
     );
 
-    if (!res.ok) {
-      console.warn("Historical fetch failed:", res.status);
-      return;
-    }
+    if (!res.ok) return;
 
     const data = await res.json();
     if (!Array.isArray(data)) return;
@@ -245,6 +259,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const coinDropdown = document.getElementById("coinSelect");
   const tfDropdown = document.getElementById("aiTimeframeSelect");
+  const themeToggle = document.getElementById("themeToggle");
 
   if (coinDropdown) coinDropdown.value = currentCoin;
   if (tfDropdown) tfDropdown.value = aiTimeframe;
@@ -259,6 +274,20 @@ document.addEventListener("DOMContentLoaded", () => {
     tfDropdown.addEventListener("change", e =>
       changeAITimeframe(e.target.value)
     );
+  }
+
+  /* ===== THEME TOGGLE ===== */
+
+  if (themeToggle) {
+    themeToggle.setAttribute("type", "button");
+    themeToggle.addEventListener("click", () => {
+
+      const isBlack = document.body.classList.toggle("black-theme");
+
+      saveTheme(isBlack ? "black" : "white");
+
+      createChart(); // re-render TradingView theme
+    });
   }
 
   document.addEventListener("visibilitychange", () => {
