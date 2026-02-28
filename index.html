@@ -1,20 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
+
+<!-- 🔥 THEME RESTORE (RUNS BEFORE PAGE LOADS) -->
+<script>
+(function () {
+  const savedTheme = localStorage.getItem("selectedTheme") || "white";
+  if (savedTheme === "black") {
+    document.documentElement.classList.add("black-theme");
+  } else {
+    document.documentElement.classList.remove("black-theme");
+  }
+})();
+</script>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Crypto Terminal-PRO</title>
 
 <style>
 :root{
-  --bg:#000;
-  --text:#fff;
-  --panel:rgba(255,255,255,0.08);
-}
-body.white{
   --bg:#fff;
   --text:#000;
   --panel:#f3f3f3;
 }
+
+/* BLACK THEME */
+.black-theme{
+  --bg:#000;
+  --text:#fff;
+  --panel:rgba(255,255,255,0.08);
+}
+
 body{
   background:var(--bg);
   color:var(--text);
@@ -23,6 +39,8 @@ body{
   padding:0 15px;
   transition:.25s ease;
 }
+
+/* KEEP ALL YOUR OTHER CSS BELOW EXACTLY AS IT IS */
 
 /* HEADER */
 header{
