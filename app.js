@@ -10,13 +10,6 @@ let currentFetchController = null;
 let requestVersion = 0;
 let priceFetchInProgress = false;
 
-/* ===== RESTORE THEME ===== */
-
-const savedTheme = localStorage.getItem("selectedTheme");
-if (savedTheme === "white") {
-  document.body.classList.add("white");
-}
-
 /* ===== MAPS ===== */
 
 const coinMap = {
@@ -58,11 +51,6 @@ function saveSelections() {
   localStorage.setItem("selectedTimeframe", aiTimeframe);
 }
 
-function saveTheme() {
-  const theme = document.body.classList.contains("white") ? "white" : "dark";
-  localStorage.setItem("selectedTheme", theme);
-}
-
 /* ===== GLOBAL ERROR GUARD ===== */
 
 window.addEventListener("unhandledrejection", function (event) {
@@ -88,7 +76,7 @@ function createChart() {
       symbol: "BINANCE:" + symbol,
       interval: "60",
       timezone: "Etc/UTC",
-      theme: document.body.classList.contains("white") ? "light" : "dark",
+      theme: "dark", // permanently dark since toggle removed
       style: "1",
       container_id: "tv_chart"
     });
@@ -257,7 +245,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const coinDropdown = document.getElementById("coinSelect");
   const tfDropdown = document.getElementById("aiTimeframeSelect");
-  const themeToggle = document.getElementById("themeToggle");
 
   if (coinDropdown) coinDropdown.value = currentCoin;
   if (tfDropdown) tfDropdown.value = aiTimeframe;
@@ -272,14 +259,6 @@ document.addEventListener("DOMContentLoaded", () => {
     tfDropdown.addEventListener("change", e =>
       changeAITimeframe(e.target.value)
     );
-  }
-
-  if (themeToggle) {
-    themeToggle.addEventListener("click", () => {
-      document.body.classList.toggle("white");
-      saveTheme();
-      createChart();
-    });
   }
 
   document.addEventListener("visibilitychange", () => {
